@@ -201,7 +201,7 @@ const SignUp = () => {
 
           <div className="w-80 mx-auto my-2">
             <ReCAPTCHA
-              sitekey="6LeMYVUhAAAAAOF5xjWDuskarMbIGqqvv7r2AGfs"
+              sitekey={process.env.ReCAPTCHA_SITE_KEY}
               onChange={handleReCAPTCHA}
             />
           </div>
