@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { set, useForm } from 'react-hook-form';
 import auth from '../firebase.init';
+import Navbar from './Navbar';
 
 const Profile = () => {
   const {
@@ -45,6 +46,8 @@ const Profile = () => {
   };
 
   return (
+   <>
+   <Navbar/>
     <div className="md:w-[600px] mx-auto flex justify-center items-center min-h-screen">
       <form className="flex-1 border p-12" onSubmit={handleSubmit(onSubmit)}>
         <h1 className="text-center font-bold text-3xl text-blue-600">
@@ -209,6 +212,7 @@ const Profile = () => {
         />
       </form>
     </div>
+   </>
   );
 };
 

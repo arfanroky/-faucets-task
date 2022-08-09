@@ -1,5 +1,9 @@
-import React, {useState } from 'react';
+import { async } from '@firebase/util';
+import axios from 'axios';
+import React, {useEffect, useRef, useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
+import Navbar from './Navbar';
+
 
 const ethHistory = [
   { id: 1, time: '12:30 AM', amount: 487, hash: '4s8er5s5fe57rjmxnfuewrurks' },
@@ -7,19 +11,40 @@ const ethHistory = [
   { id: 3, time: '11:30 AM', amount: 797, hash: 'se4s7er7' },
 ];
 
+
+
 const Home = () => {
+  const [value, setValue] = useState();
   const [eth, setEth] = useState({});
+const [walletAddress, setWalletAddress] = useState();
+const linkRef = useRef();
+const ethRef = useRef();
   const outPut = async (items) => {
     items.map((item) => setEth(item));
   };
 
 
-  const handleReCAPTCHA = (value) => {
-    console.log(value);
+  const handleReCAPTCHA = (e) => {
+    console.log(e);
   };
+
+
+  const handleWalletValue = async () => {
+    const walletInfo = {
+      walletAddress: walletAddress,
+      link: linkRef.current.value,
+      eth: ethRef.current.value
+    }
+    const {data} = await axios.post('http://localhost:8000/wallet', walletInfo)
+ 
+      console.log(data);
+
+
+  }
 
   return (
     <>
+    <Navbar setValue={setValue} />
       <main className="-z-10 min-h-screen my-12">
         <p className="bg-blue-500 text-center py-6 font-semibold text-white">
           Notice Here
@@ -38,8 +63,8 @@ const Home = () => {
           <div className="w-3/4 mx-auto bg-white border-2 h-auto p-6">
             <p>
               Your wallet is connected to{' '}
-              <span className="font-bold">Ethereum Kovan</span>, so you are
-              requesting <span className="font-bold">Ethereum Kovan</span>{' '}
+              <span className="font-bold">{value}</span>, so you are
+              requesting <span className="font-bold">{value}</span>{' '}
               Link/ETH.
             </p>
             <div className=" my-3 ">
@@ -53,13 +78,14 @@ const Home = () => {
                 className="block outline-none border border-gray-500 w-full pl-2"
                 type="text"
                 placeholder="Wallet Address..."
+                onChange={(e) => setWalletAddress(e.target.value)}
               />
             </div>
 
             <div className=" my-3 flex-1">
               <label
                 className="block font-bold text-blue-500 text-sm mb-1"
-                htmlFor="walletAddress"
+                htmlFor="requestType"
               >
                 Request Type
               </label>
@@ -67,12 +93,16 @@ const Home = () => {
                 <input
                   className="block outline-none border border-gray-500 w-full pl-2"
                   type="text"
-                  placeholder="20 Test Link"
+                  value="20 Test Link"
+                  disabled
+                  ref={linkRef}
                 />
                 <input
                   className="block outline-none border border-gray-500 w-full pl-2"
                   type="text"
-                  placeholder="0.5 ETH"
+                  value="0.5 ETH"
+                  disabled
+                  ref={ethRef}
                 />
               </div>
             </div>
@@ -81,7 +111,9 @@ const Home = () => {
               sitekey="6LeMYVUhAAAAAOF5xjWDuskarMbIGqqvv7r2AGfs"
               onChange={handleReCAPTCHA}
             />
-            <button className="btn bg-blue-500 py-2 px-6 font-semibold text-white hover:bg-blue-700 mt-4">
+            <button 
+            onClick={() => handleWalletValue()}
+            className="btn bg-blue-500 py-2 px-6 font-semibold text-white hover:bg-blue-700 mt-4">
               Send Request
             </button>
 
@@ -136,4 +168,5 @@ const Home = () => {
   );
 };
 
-export default Home;
+
+export default(Home);

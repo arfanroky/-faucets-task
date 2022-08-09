@@ -33,9 +33,6 @@ const SignUp = () => {
   if (createError || updateError || error)
     console.log(createError || updateError || error);
 
-  // if(user){
-  //   navigate('/')
-  // }
 
   const onSubmit = async (e) => {
     const name = e.firstName.concat(' ', e.lastName);
@@ -43,15 +40,17 @@ const SignUp = () => {
     await updateProfile({ displayName: name });
 
     const userCredential = {
-      name: name,
+      firstName: e.firstName,
+      lastName: e.lastName,
       email: e.email,
       phone: e.phone,
+      password: e.password
     };
 
     if (e.email) {
       const { data } = await axios
-        .put(
-          `https://intense-chamber-34587.herokuapp.com/user/${e.email}`,
+        .post(
+          `http://localhost:8000/register`,
           userCredential
         )
         .catch((error) => console.log(error));
@@ -64,9 +63,6 @@ const SignUp = () => {
     reset();
   };
 
-  const handleReCAPTCHA = (value) => {
-    console.log(value);
-  };
 
   return (
     <div className="flex justify-center items-center h-screen">
@@ -94,6 +90,7 @@ const SignUp = () => {
             <input
               className="block w-full outline-none border-b border-black focus:border-gray-600 pt-1 pb-2"
               type="text"
+              name='firstName'
               {...register('firstName', {
                 required: {
                   value: true,
@@ -117,6 +114,7 @@ const SignUp = () => {
             <input
               className="block outline-none border-b border-black w-full focus:border-gray-600 pt-1 pb-2"
               type="text"
+              name='lastName'
               {...register('lastName', {
                 required: {
                   value: true,
@@ -140,6 +138,7 @@ const SignUp = () => {
             <input
               className="block outline-none border-b border-black w-full focus:border-gray-600 pt-1 pb-2"
               type="tel"
+              name='phone'
               {...register('phone', {
                 required: {
                   value: true,
@@ -161,6 +160,7 @@ const SignUp = () => {
               Email
             </label>
             <input
+            name='email'
               className="block outline-none border-b border-black w-full focus:border-gray-600 pt-1 pb-2"
               type="email"
               {...register('email', {
@@ -184,6 +184,7 @@ const SignUp = () => {
               Password
             </label>
             <input
+            name='password'
               className="block outline-none border-b border-black w-full focus:border-gray-600 pt-1 pb-2"
               type="password"
               {...register('password', {
@@ -198,14 +199,6 @@ const SignUp = () => {
               <span className="text-blue-600">{errors.password.message}</span>
             )}
           </div>
-
-          <div className="w-80 mx-auto my-2">
-            <ReCAPTCHA
-              sitekey={process.env.ReCAPTCHA_SITE_KEY}
-              onChange={handleReCAPTCHA}
-            />
-          </div>
-
           <input
             className="btn py-2 w-80 mx-auto block bg-blue-400 font-bold text-white rounded hover:bg-blue-600 transition"
             type="submit"

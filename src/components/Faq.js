@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/solid';
 import { Data } from './Data';
+import Navbar from './Navbar';
 
 const Faq = () => {
   const [faq, setFaq] = useState(false);
@@ -12,6 +13,8 @@ const Faq = () => {
   };
 
   return (
+  <>
+  <Navbar/>
     <main>
       <h1 className="font-bold text-2xl text-blue-500 text-center my-6 block">
         Frequently Asked Questions
@@ -41,6 +44,7 @@ const Faq = () => {
         </article>
       </div>
     </main>
+  </>
   );
 };
 
