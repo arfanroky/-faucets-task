@@ -5,18 +5,18 @@ const Dropdown = ({ setValue }) => {
   const [authority, setAuthority] = useState([]);
   const [selectsValue, setSelectsValue] = useState('Ethereum Kovan');
 
-
-
   useEffect(() => {
     const fetchAuthority = async () => {
-      const { data } = await axios.get('http://localhost:5000/authority');
+      const { data } = await axios.get(
+        'https://faucets-app.herokuapp.com/authority'
+      );
       setAuthority(data);
     };
     fetchAuthority();
     const sendValue = async () => {
       await setValue(selectsValue);
     };
-  
+
     sendValue();
   }, [selectsValue, setValue]);
 

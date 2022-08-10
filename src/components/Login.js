@@ -20,7 +20,7 @@ const Login = () => {
 
   const onSubmit = async (e) => {
     const res = await axios.get(
-      `http://localhost:5000/people/${e.email}/${e.password}`
+      `https://faucets-app.herokuapp.com/people/${e.email}/${e.password}`
     );
     console.log(res);
     if (res?.data.message) {

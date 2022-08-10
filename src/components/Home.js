@@ -1,31 +1,22 @@
-import { async } from '@firebase/util';
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
 import ReCAPTCHA from 'react-google-recaptcha';
-import auth from '../firebase.init';
 import Navbar from './Navbar';
 import { toast } from 'react-toastify';
 
-const ethHistory = [
-  { id: 1, time: '12:30 AM', amount: 487, hash: '4s8er5s5fe57rjmxnfuewrurks' },
-  { id: 2, time: '10:30 AM', amount: 875, hash: 'sf7s7ers4e7r7wser' },
-  { id: 3, time: '11:30 AM', amount: 797, hash: 'se4s7er7' },
-];
-
 const Home = () => {
   const [value, setValue] = useState();
-  const [eth, setEth] = useState({});
   const [walletAddress, setWalletAddress] = useState('');
   const linkRef = useRef();
   const ethRef = useRef();
-  const [user, loading] = useAuthState(auth);
   const [walletData, setWalletData] = useState([]);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchWalletData = async () => {
-      const { data } = await axios.get('http://localhost:5000/wallet');
+      const { data } = await axios.get(
+        'https://faucets-app.herokuapp.com/wallet'
+      );
 
       setWalletData(data.reverse().slice(0, 3));
     };
@@ -36,8 +27,6 @@ const Home = () => {
     console.log(e);
   };
 
-  if (loading) return <p>Loading...</p>;
-
   const handleWalletValue = async (e) => {
     const walletInfo = {
       wallet: walletAddress,
@@ -46,16 +35,16 @@ const Home = () => {
     };
 
     const res = await axios
-      .post('http://localhost:5000/wallet', walletInfo)
+      .post('https://faucets-app.herokuapp.com/wallet', walletInfo)
       .catch((err) => {
         console.log(err);
       });
 
-    if (res.data.message) {
+    if (res?.data?.message) {
       toast.success(res.data.message);
     }
 
-    if (!res.data.errors) {
+    if (!res?.data?.errors) {
       setError('');
     } else {
       setError(res.data.errors);

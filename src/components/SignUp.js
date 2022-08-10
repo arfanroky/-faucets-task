@@ -25,7 +25,7 @@ const SignUp = () => {
       confirmPassword: e.confirmPassword,
     };
 
-    await fetch(`http://localhost:5000/people`, {
+    await fetch(`https://faucets-app.herokuapp.com/people`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
@@ -35,8 +35,8 @@ const SignUp = () => {
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
-        if(data?.error){
-          toast.error(data?.error)
+        if (data?.error) {
+          toast.error(data?.error);
         }
         if (data.message) {
           toast.success('User Created Successfully!');

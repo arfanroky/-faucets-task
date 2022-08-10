@@ -19,7 +19,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       const { data } = await axios.get(
-        `http://localhost:5000/user/${user?.email}`
+        `https://faucets-app.herokuapp.com/user/${user?.email}`
       );
       setUserInfo(data);
     };
@@ -38,7 +38,7 @@ const Profile = () => {
     };
 
     const { data } = await axios.patch(
-      `http://localhost:5000/user/profile/${user.email}`,
+      `https://faucets-app.herokuapp.com/user/profile/${user.email}`,
       newUserInfo
     );
 
