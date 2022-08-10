@@ -1,9 +1,11 @@
 import { async } from '@firebase/util';
 import axios from 'axios';
-import React, {useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import ReCAPTCHA from 'react-google-recaptcha';
+import auth from '../firebase.init';
 import Navbar from './Navbar';
-
+import { toast} from 'react-toastify';
 
 const ethHistory = [
   { id: 1, time: '12:30 AM', amount: 487, hash: '4s8er5s5fe57rjmxnfuewrurks' },
@@ -11,40 +13,71 @@ const ethHistory = [
   { id: 3, time: '11:30 AM', amount: 797, hash: 'se4s7er7' },
 ];
 
-
-
 const Home = () => {
   const [value, setValue] = useState();
   const [eth, setEth] = useState({});
-const [walletAddress, setWalletAddress] = useState();
-const linkRef = useRef();
-const ethRef = useRef();
+  const [walletAddress, setWalletAddress] = useState('');
+  const linkRef = useRef();
+  const ethRef = useRef();
+  const walletRef = useRef();
+  const [user, loading] = useAuthState(auth);
+  const [walletData, setWalletData] = useState([]);
+  const [error, setError] = useState('');
+ 
+  useEffect(() => {
+    const fetchWalletData = async () => {
+      const { data } = await axios.get('http://localhost:8000/wallet');
+
+      setWalletData(data.reverse().slice(0, 3));
+    };
+    fetchWalletData();
+  }, []);
+
+
   const outPut = async (items) => {
     items.map((item) => setEth(item));
   };
-
 
   const handleReCAPTCHA = (e) => {
     console.log(e);
   };
 
 
-  const handleWalletValue = async () => {
+  
+  if (loading) return <p>Loading...</p>;
+
+
+  const handleWalletValue = async (e) => {
     const walletInfo = {
-      walletAddress: walletAddress,
+      wallet: walletAddress,
       link: linkRef.current.value,
-      eth: ethRef.current.value
+      eth: ethRef.current.value,
+      email: user.email,
+    };
+
+    const res = await axios.post(
+      'http://localhost:8000/wallet',
+      walletInfo
+    ).catch(err => {
+      console.log(err);
+    })
+
+    if(res.data.message){
+      toast.success(res.data.message)
     }
-    const {data} = await axios.post('http://localhost:8000/wallet', walletInfo)
- 
-      console.log(data);
 
+    if(!res.data.errors){
+      setError('')
+    }
+    else{
+      setError(res.data.errors);
+    }
 
-  }
+  };
 
   return (
     <>
-    <Navbar setValue={setValue} />
+      <Navbar setValue={setValue} />
       <main className="-z-10 min-h-screen my-12">
         <p className="bg-blue-500 text-center py-6 font-semibold text-white">
           Notice Here
@@ -63,9 +96,8 @@ const ethRef = useRef();
           <div className="w-3/4 mx-auto bg-white border-2 h-auto p-6">
             <p>
               Your wallet is connected to{' '}
-              <span className="font-bold">{value}</span>, so you are
-              requesting <span className="font-bold">{value}</span>{' '}
-              Link/ETH.
+              <span className="font-bold">{value}</span>, so you are requesting{' '}
+              <span className="font-bold">{value}</span> Link/ETH.
             </p>
             <div className=" my-3 ">
               <label
@@ -77,9 +109,11 @@ const ethRef = useRef();
               <input
                 className="block outline-none border border-gray-500 w-full pl-2"
                 type="text"
+                name='wallet'
                 placeholder="Wallet Address..."
                 onChange={(e) => setWalletAddress(e.target.value)}
               />
+              <span className='text-red-600'>{ error ? error?.wallet.msg : ''}</span>
             </div>
 
             <div className=" my-3 flex-1">
@@ -111,9 +145,10 @@ const ethRef = useRef();
               sitekey="6LeMYVUhAAAAAOF5xjWDuskarMbIGqqvv7r2AGfs"
               onChange={handleReCAPTCHA}
             />
-            <button 
-            onClick={() => handleWalletValue()}
-            className="btn bg-blue-500 py-2 px-6 font-semibold text-white hover:bg-blue-700 mt-4">
+            <button
+              onClick={() => handleWalletValue()}
+              className="btn bg-blue-500 py-2 px-6 font-semibold text-white hover:bg-blue-700 mt-4"
+            >
               Send Request
             </button>
 
@@ -132,32 +167,26 @@ const ethRef = useRef();
               </div>
               <table class="table-auto w-[600px] border">
                 <thead>
-                  <tr className='border'>
-                    <th >Sr</th>
+                  <tr className="border">
+                    <th>Sr</th>
                     <th>Time</th>
                     <th>Amount</th>
+                    <th>Link</th>
                     <th>Hash</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className='border'>
-                    <td>1</td>
-                    <td>12:30 AM</td>
-                    <td>487</td>
-                    <td>4s8er5s5fe57rjmxnfuewrurks</td>
-                  </tr>
-                  <tr className='border'>
-                    <td>2</td>
-                    <td>10:30 AM</td>
-                    <td>875</td>
-                    <td>sf7s7ers4e7r7wser</td>
-                  </tr>
-                  <tr className='border'>
-                    <td>3</td>
-                    <td>11:30 AM</td>
-                    <td>797</td>
-                    <td>se4s7er7</td>
-                  </tr>
+                  {walletData?.map((data, index) => (
+                    <>
+                      <tr className="border">
+                        <td>{index + 1}</td>
+                        <td>{data.date.slice(0, 10)}</td>
+                        <td>{data.eth}</td>
+                        <td>{data.link}</td>
+                        <td>{data.wallet}</td>
+                      </tr>
+                    </>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -168,5 +197,4 @@ const ethRef = useRef();
   );
 };
 
-
-export default(Home);
+export default Home;

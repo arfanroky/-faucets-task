@@ -33,20 +33,6 @@ const Navbar = ({ setValue }) => {
           </Link>
           <div className="flex items-center gap-6">
       
-            {/* <select
-              key={name._id}
-              value={name?.name}
-              onChange={(e) => setSelectsValue(e.target.value)}
-              className=" outline-none border border-blue-400 p-2"
-            >
-              {authority.map((name) => (
-                <>
-                
-                  <option key={name._id}>{name.name}</option>
-                </>
-              ))}
-            </select> */}
-
             <Dropdown setValue={setValue}/>
 
             <button

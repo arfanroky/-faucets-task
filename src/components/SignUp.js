@@ -51,7 +51,7 @@ const SignUp = () => {
       const { data } = await axios
         .post(
           `http://localhost:8000/register`,
-          userCredential
+          {userCredential}
         )
         .catch((error) => console.log(error));
 
