@@ -13,7 +13,9 @@ const Dropdown = ({ setValue }) => {
 
   useEffect(() => {
     const fetchAuthority = async () => {
-      const { data } = await axios.get('http://localhost:8000/authority');
+      const { data } = await axios.get(
+        'https://intense-chamber-34587.herokuapp.com/authority'
+      );
       setAuthority(data);
     };
     fetchAuthority();

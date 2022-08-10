@@ -1,12 +1,9 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import {
-  useAuthState,
-  useSignInWithEmailAndPassword,
-} from 'react-firebase-hooks/auth';
+import React, { useState } from 'react';
+
 import { useForm } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import auth from '../firebase.init';
+
 import { toast } from 'react-toastify';
 
 const Login = () => {
@@ -19,32 +16,18 @@ const Login = () => {
   } = useForm();
   const location = useLocation();
   const navigate = useNavigate();
-  const [user, loading, authError] = useAuthState(auth);
-  const [signInWithEmailAndPassword, signInUser, signInLoading, signInError] =
-    useSignInWithEmailAndPassword(auth);
   let from = location.state?.from?.pathname || '/';
 
-  if (loading || signInLoading) return <p>Loading.....</p>;
-  if (authError || signInError) console.log(authError);
-
+  console.log(error);
   const onSubmit = async (e) => {
-    await signInWithEmailAndPassword(e.email, e.password);
-    if (e.email) {
-      const { data } = await axios
-        .get(`http://localhost:8000/people/${e.email}/${e.password}`)
-        .catch((err) => {
-          console.log(err);
-        });
-      console.log(data);
-      if (data.message) {
-        toast.success('Logged in successfully!');
-        navigate(from, { replace: true });
-      }
-      setError(data.errors);
-    } else {
-      toast.error('Email must type!');
+    const res = await axios.get(
+      `https://intense-chamber-34587.herokuapp.com/people/${e.email}/${e.password}`
+    );
+    console.log(res);
+    if (res?.data.message) {
+      toast.success('Logged in successfully');
+      navigate('/');
     }
-
     reset();
   };
 

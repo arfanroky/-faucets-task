@@ -30,15 +30,11 @@ const SignUp = () => {
   const [updateProfile, updating, updateError] = useUpdateProfile(auth);
   const [user, loading, authError] = useAuthState(auth);
 
-  if (createLoading || updating || loading) return <p>Loading...</p>;
-  if (createError || updateError || authError)
-    console.log(createError || updateError || authError);
+  // if (createLoading || updating || loading) return <p>Loading...</p>;
+  // if (createError || updateError || authError)
+  //   console.log(createError || updateError || authError);
 
   const onSubmit = async (e) => {
-    const name = e.firstName.concat(' ', e.lastName);
-    await createUserWithEmailAndPassword(e.email, e.password);
-    await updateProfile({ displayName: name });
-
     const userCredential = {
       firstName: e.firstName,
       lastName: e.lastName,
@@ -48,28 +44,24 @@ const SignUp = () => {
       confirmPassword: e.confirmPassword,
     };
 
-    if (e.email) {
-      await fetch(`http://localhost:8000/people`, {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify(userCredential),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          if (data.message) {
-            toast.success('User Created Successfully!');
-          }
-          setError(data.errors);
-          if (data.message) {
-            navigate('/');
-          }
-        });
-    } else {
-      toast.error('Email must type!');
-    }
+    await fetch(`https://intense-chamber-34587.herokuapp.com/people`, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(userCredential),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        if (data.message) {
+          toast.success('User Created Successfully!');
+        }
+        setError(data.errors);
+        if (data.message) {
+          navigate('/');
+        }
+      });
 
     reset();
   };

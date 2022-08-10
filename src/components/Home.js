@@ -25,7 +25,9 @@ const Home = () => {
 
   useEffect(() => {
     const fetchWalletData = async () => {
-      const { data } = await axios.get('http://localhost:8000/wallet');
+      const { data } = await axios.get(
+        'https://intense-chamber-34587.herokuapp.com/wallet'
+      );
 
       setWalletData(data.reverse().slice(0, 3));
     };
@@ -47,7 +49,7 @@ const Home = () => {
     };
 
     const res = await axios
-      .post('http://localhost:8000/wallet', walletInfo)
+      .post('https://intense-chamber-34587.herokuapp.com/wallet', walletInfo)
       .catch((err) => {
         console.log(err);
       });
