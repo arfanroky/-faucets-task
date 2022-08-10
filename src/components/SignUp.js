@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
-import ReCAPTCHA from 'react-google-recaptcha';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import {
-  useAuthState,
-  useCreateUserWithEmailAndPassword,
-  useUpdateProfile,
-} from 'react-firebase-hooks/auth';
-import auth from '../firebase.init';
 import { toast } from 'react-toastify';
 
 const SignUp = () => {
@@ -21,18 +14,6 @@ const SignUp = () => {
     reset,
     formState: { errors },
   } = useForm();
-  const [
-    createUserWithEmailAndPassword,
-    createUser,
-    createLoading,
-    createError,
-  ] = useCreateUserWithEmailAndPassword(auth, { sendEmailVerification: true });
-  const [updateProfile, updating, updateError] = useUpdateProfile(auth);
-  const [user, loading, authError] = useAuthState(auth);
-
-  // if (createLoading || updating || loading) return <p>Loading...</p>;
-  // if (createError || updateError || authError)
-  //   console.log(createError || updateError || authError);
 
   const onSubmit = async (e) => {
     const userCredential = {
@@ -44,7 +25,7 @@ const SignUp = () => {
       confirmPassword: e.confirmPassword,
     };
 
-    await fetch(`https://intense-chamber-34587.herokuapp.com/people`, {
+    await fetch(`http://localhost:5000/people`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
@@ -54,10 +35,13 @@ const SignUp = () => {
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
+        if(data?.error){
+          toast.error(data?.error)
+        }
         if (data.message) {
           toast.success('User Created Successfully!');
         }
-        setError(data.errors);
+        setError(data?.errors);
         if (data.message) {
           navigate('/');
         }

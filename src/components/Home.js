@@ -25,9 +25,7 @@ const Home = () => {
 
   useEffect(() => {
     const fetchWalletData = async () => {
-      const { data } = await axios.get(
-        'https://intense-chamber-34587.herokuapp.com/wallet'
-      );
+      const { data } = await axios.get('http://localhost:5000/wallet');
 
       setWalletData(data.reverse().slice(0, 3));
     };
@@ -45,11 +43,10 @@ const Home = () => {
       wallet: walletAddress,
       link: linkRef.current.value,
       eth: ethRef.current.value,
-      email: user.email,
     };
 
     const res = await axios
-      .post('https://intense-chamber-34587.herokuapp.com/wallet', walletInfo)
+      .post('http://localhost:5000/wallet', walletInfo)
       .catch((err) => {
         console.log(err);
       });
@@ -150,7 +147,7 @@ const Home = () => {
               <div className="md:flex my-4 text-white gap-5">
                 <button
                   onClick={() => setWalletData(walletData)}
-                  className="btn btn-secondary md:mb-0 mb-4"
+                  className="btn btn-secondary md:mb-0 mb-4 "
                 >
                   ETH Transaction History
                 </button>
@@ -175,15 +172,13 @@ const Home = () => {
                   </thead>
                   <tbody>
                     {walletData?.map((data, index) => (
-                      <>
-                        <tr key={data._id} className="border ">
-                          <td>{index + 1}</td>
-                          <td>{data.date.slice(0, 10)}</td>
-                          <td>{data.eth}</td>
-                          <td>{data.link}</td>
-                          <td>{data.wallet.slice(0, 10)}</td>
-                        </tr>
-                      </>
+                      <tr key={data._id} className="border ">
+                        <td>{index + 1}</td>
+                        <td>{data.date.slice(0, 10)}</td>
+                        <td>{data.eth}</td>
+                        <td>{data.link}</td>
+                        <td>{data.wallet.slice(0, 10)}</td>
+                      </tr>
                     ))}
                   </tbody>
                 </table>
@@ -191,35 +186,31 @@ const Home = () => {
 
               <div className="md:hidden block">
                 {walletData.map((wallet) => (
-                  <>
-                    <div
-                      key={wallet._id}
-                      className="shadow rounded my-4 border border-gray-300 p-2"
-                    >
-                      <div className="flex justify-between">
-                        <span className="font-bold">Time</span>
-                        <p className="text-primary">
-                          {wallet.date.slice(0, 10)}
-                        </p>
-                      </div>
-
-                      <div className="flex justify-between">
-                        <span className="font-bold">Amount</span>
-                        <p className="text-secondary">{wallet.eth}</p>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-bold">Link</span>
-                        <p className="text-secondary">{wallet.link}</p>
-                      </div>
-
-                      <div className="flex justify-between">
-                        <span className="font-bold">Hash</span>
-                        <p className="text-green-600">
-                          {wallet.wallet.slice(0, 10)}
-                        </p>
-                      </div>
+                  <div
+                    key={wallet._id}
+                    className="shadow rounded my-4 border border-gray-300 p-2"
+                  >
+                    <div className="flex justify-between">
+                      <span className="font-bold">Time</span>
+                      <p className="text-primary">{wallet.date.slice(0, 10)}</p>
                     </div>
-                  </>
+
+                    <div className="flex justify-between">
+                      <span className="font-bold">Amount</span>
+                      <p className="text-secondary">{wallet.eth}</p>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-bold">Link</span>
+                      <p className="text-secondary">{wallet.link}</p>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span className="font-bold">Hash</span>
+                      <p className="text-green-600">
+                        {wallet.wallet.slice(0, 10)}
+                      </p>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>

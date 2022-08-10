@@ -5,21 +5,20 @@ const Dropdown = ({ setValue }) => {
   const [authority, setAuthority] = useState([]);
   const [selectsValue, setSelectsValue] = useState('Ethereum Kovan');
 
-  const sendValue = async () => {
-    await setValue(selectsValue);
-  };
 
-  sendValue();
 
   useEffect(() => {
     const fetchAuthority = async () => {
-      const { data } = await axios.get(
-        'https://intense-chamber-34587.herokuapp.com/authority'
-      );
+      const { data } = await axios.get('http://localhost:5000/authority');
       setAuthority(data);
     };
     fetchAuthority();
-  }, [selectsValue]);
+    const sendValue = async () => {
+      await setValue(selectsValue);
+    };
+  
+    sendValue();
+  }, [selectsValue, setValue]);
 
   return (
     <div className="dropdown dropdown-end">

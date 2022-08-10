@@ -18,10 +18,9 @@ const Login = () => {
   const navigate = useNavigate();
   let from = location.state?.from?.pathname || '/';
 
-  console.log(error);
   const onSubmit = async (e) => {
     const res = await axios.get(
-      `https://intense-chamber-34587.herokuapp.com/people/${e.email}/${e.password}`
+      `http://localhost:5000/people/${e.email}/${e.password}`
     );
     console.log(res);
     if (res?.data.message) {
