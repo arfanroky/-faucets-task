@@ -10,16 +10,13 @@ import { Link } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import auth from '../firebase.init';
 import { signOut } from 'firebase/auth';
-import axios from 'axios';
 import Dropdown from './Dropdown';
 
-const Navbar = ({ setValue }) => {
+const Navbar = ({ passFunc }) => {
   const [userProfile, setUserProfile] = useState(false);
   const [wallet, setWallet] = useState(false);
   const [user, loading, error] = useAuthState(auth);
-
   const name = user?.displayName;
-
 
   if (loading) return <p>Loading....</p>;
   if (error) alert(error);
@@ -32,8 +29,7 @@ const Navbar = ({ setValue }) => {
             <h3 className="text-2xl font-bold text-blue-500">Faucets</h3>
           </Link>
           <div className="flex items-center gap-6">
-      
-            <Dropdown setValue={setValue}/>
+            <Dropdown setValue={passFunc} />
 
             <button
               onClick={() => setWallet(!wallet)}
@@ -88,12 +84,12 @@ const Navbar = ({ setValue }) => {
                   <Link to="/profile">Profile</Link>
                 </li>
                 {user ? (
-                  <button
+                  <li
                     onClick={() => signOut(auth)}
-                    className="btn bg-blue-600 text-white py-2 px-4"
+                    className="w-full text-white"
                   >
                     Sign Out
-                  </button>
+                  </li>
                 ) : (
                   <>
                     <li className=" w-full text-white">

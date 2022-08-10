@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
@@ -10,10 +10,11 @@ import {
   useUpdateProfile,
 } from 'react-firebase-hooks/auth';
 import auth from '../firebase.init';
+import { toast } from 'react-toastify';
 
 const SignUp = () => {
   const navigate = useNavigate();
-
+  const [error, setError] = useState('');
   const {
     register,
     handleSubmit,
@@ -27,52 +28,60 @@ const SignUp = () => {
     createError,
   ] = useCreateUserWithEmailAndPassword(auth, { sendEmailVerification: true });
   const [updateProfile, updating, updateError] = useUpdateProfile(auth);
-  const [user, loading, error] = useAuthState(auth);
+  const [user, loading, authError] = useAuthState(auth);
 
   if (createLoading || updating || loading) return <p>Loading...</p>;
-  if (createError || updateError || error)
-    console.log(createError || updateError || error);
-
+  if (createError || updateError || authError) alert(createError || updateError || authError);
 
   const onSubmit = async (e) => {
     const name = e.firstName.concat(' ', e.lastName);
-    await createUserWithEmailAndPassword(e.email, e.password);
-    await updateProfile({ displayName: name });
+    // await createUserWithEmailAndPassword(e.email, e.password);
+    // await updateProfile({ displayName: name });
 
     const userCredential = {
       firstName: e.firstName,
       lastName: e.lastName,
       email: e.email,
       phone: e.phone,
-      password: e.password
+      password: e.password,
+      confirmPassword: e.confirmPassword,
     };
 
-    if (e.email) {
-      const { data } = await axios
-        .post(
-          `http://localhost:8000/register`,
-          {userCredential}
-        )
-        .catch((error) => console.log(error));
+    console.log(userCredential);
 
-      if (data.result.acknowledged) {
-        navigate('/');
-      }
+    if (e.email) {
+      await fetch(`http://localhost:8000/register`, {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify(userCredential),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          toast.success(data.message);
+          setError(data.errors);
+          if (data.message) {
+            navigate('/');
+          }
+        });
+    }
+    else{
+      toast.error('Email must type!')
     }
 
     reset();
   };
 
-
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <div className="md:flex justify-center items-center md:w-[800px] w-[400px] md:h-[600px] h-700px border shadow-xl rounded gap-4">
         <div className="bg-blue-400 md:h-full md:py-0 py-12 flex-1 flex justify-center items-center flex-col">
           <h1 className="text-2xl font-bold text-white">
             You Have an Account?
           </h1>
           <Link to="/login">
-            <button className="btn bg-white py-2 px-6 mt-4 rounded font-bold">
+            <button className="btn btn-accent hover:bg-white bg-white py-2 px-6 mt-4 rounded font-bold">
               Login
             </button>
           </Link>
@@ -90,18 +99,14 @@ const SignUp = () => {
             <input
               className="block w-full outline-none border-b border-black focus:border-gray-600 pt-1 pb-2"
               type="text"
-              name='firstName'
-              {...register('firstName', {
-                required: {
-                  value: true,
-                  message: 'Write your first name',
-                },
-              })}
+              name="firstName"
+              {...register('firstName')}
               placeholder="Enter your first name"
             />
-            {errors.firstName?.type === 'required' && (
-              <span className="text-blue-600">{errors.firstName.message}</span>
-            )}
+            <span className="text-red-500">
+              {' '}
+              {error ? error.firstName.msg : ''}
+            </span>
           </div>
 
           <div className=" my-3 w-80 mx-auto">
@@ -114,18 +119,14 @@ const SignUp = () => {
             <input
               className="block outline-none border-b border-black w-full focus:border-gray-600 pt-1 pb-2"
               type="text"
-              name='lastName'
-              {...register('lastName', {
-                required: {
-                  value: true,
-                  message: 'Write your last name',
-                },
-              })}
+              name="lastName"
+              {...register('lastName')}
               placeholder="Enter your last name"
             />
-            {errors.lastName?.type === 'required' && (
-              <span className="text-blue-600">{errors.lastName.message}</span>
-            )}
+            <span className="text-red-500">
+              {' '}
+              {error ? error.lastName.msg : ''}
+            </span>
           </div>
 
           <div className=" my-3 w-80 mx-auto">
@@ -138,18 +139,14 @@ const SignUp = () => {
             <input
               className="block outline-none border-b border-black w-full focus:border-gray-600 pt-1 pb-2"
               type="tel"
-              name='phone'
-              {...register('phone', {
-                required: {
-                  value: true,
-                  message: 'Write your phone number',
-                },
-              })}
+              name="phone"
+              {...register('phone')}
               placeholder="Enter your phone number"
             />
-            {errors.phone?.type === 'required' && (
-              <span className="text-blue-600">{errors.phone.message}</span>
-            )}
+            <span className="text-red-500">
+              {' '}
+              {error ? error.phone.msg : ''}
+            </span>
           </div>
 
           <div className=" my-3 w-80 mx-auto">
@@ -160,20 +157,16 @@ const SignUp = () => {
               Email
             </label>
             <input
-            name='email'
+              name="email"
               className="block outline-none border-b border-black w-full focus:border-gray-600 pt-1 pb-2"
               type="email"
-              {...register('email', {
-                required: {
-                  value: true,
-                  message: 'Write your email',
-                },
-              })}
+              {...register('email')}
               placeholder="Enter your email"
             />
-            {errors.email?.type === 'required' && (
-              <span className="text-blue-600">{errors.email.message}</span>
-            )}
+            <span className="text-red-500">
+              {' '}
+              {error ? error.email.msg : ''}
+            </span>
           </div>
 
           <div className=" my-3 w-80 mx-auto">
@@ -184,23 +177,39 @@ const SignUp = () => {
               Password
             </label>
             <input
-            name='password'
+              name="password"
               className="block outline-none border-b border-black w-full focus:border-gray-600 pt-1 pb-2"
               type="password"
-              {...register('password', {
-                required: {
-                  value: true,
-                  message: 'Write your password',
-                },
-              })}
+              {...register('password')}
               placeholder="Enter your password"
             />
-            {errors.password?.type === 'required' && (
-              <span className="text-blue-600">{errors.password.message}</span>
-            )}
+            <span className="text-red-500">
+              {' '}
+              {error ? error.password.msg : ''}
+            </span>
           </div>
+          <div className=" my-3 w-80 mx-auto">
+            <label
+              htmlFor="confirmPassword"
+              className="block font-bold text-gray-600 text-sm"
+            >
+              confirmPassword
+            </label>
+            <input
+              name="confirmPassword"
+              className="block outline-none border-b border-black w-full focus:border-gray-600 pt-1 pb-2"
+              type="password"
+              {...register('confirmPassword')}
+              placeholder="Enter your confirmPassword"
+            />
+            <span className="text-red-500">
+              {' '}
+              {error ? error.confirmPassword.msg : ''}
+            </span>
+          </div>
+
           <input
-            className="btn py-2 w-80 mx-auto block bg-blue-400 font-bold text-white rounded hover:bg-blue-600 transition"
+            className="outline-none border-none py-2 w-80 mx-auto block bg-blue-400 font-bold text-white rounded hover:bg-blue-600 transition"
             type="submit"
             value="Sign Up"
           />

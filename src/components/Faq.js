@@ -13,38 +13,45 @@ const Faq = () => {
   };
 
   return (
-  <>
-  <Navbar/>
-    <main>
-      <h1 className="font-bold text-2xl text-blue-500 text-center my-6 block">
-        Frequently Asked Questions
-      </h1>
-      <div className="flex flex-col items-center justify-center relative min-h-screen bg-gray-100">
-        <article className="absolute top-1/4 shadow-lg w-[700px] p-6 ">
-          {Data.map((item) => (
-            <>
+    <>
+      <Navbar />
+      <main className=" bg-gray-100">
+        <br />
+        <br /> <br /> <br />
+        <h1 className="font-bold text-2xl text-blue-500 text-center">
+          Frequently Asked Questions
+        </h1>
+        <div className="flex items-center justify-center ">
+          <article className="shadow-lg md:w-3/4 p-6 ">
+            {Data.map((item) => (
               <div
+                key={item.id}
                 onClick={() => toggle(item.id)}
-                className="flex justify-between items-center w-full cursor-pointer border border-blue-500 my-4"
+                className=" w-full cursor-pointer border border-blue-500 my-4 p-3"
               >
-                <h2 className="font-bold text-gray-600 text-xl">
-                  {item.title}
-                </h2>
-                <span>
-                  {faq === item.id ? (
-                    <ArrowDownIcon className="w-4 h-4" />
-                  ) : (
-                    <ArrowUpIcon className="w-4 h-4" />
-                  )}
-                </span>
+                <div className="flex justify-between items-center">
+                  <h2 className="font-bold text-gray-600 text-xl">
+                    {item.title}
+                  </h2>
+                  <span>
+                    {faq === item.id ? (
+                      <ArrowDownIcon className="w-4 h-4" />
+                    ) : (
+                      <ArrowUpIcon className="w-4 h-4" />
+                    )}
+                  </span>
+                </div>
+
+                {faq === item.id ? (
+                  <p className="py-3 text-justify">{item.desc}</p>
+                ) : null}
               </div>
-              {faq === item.id ? <p className='py-3 text-justify'>{item.desc}</p> : null}
-            </>
-          ))}
-        </article>
-      </div>
-    </main>
-  </>
+            ))}
+          </article>
+        </div>
+        <br />
+      </main>
+    </>
   );
 };
 

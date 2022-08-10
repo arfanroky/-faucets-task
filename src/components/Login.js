@@ -104,7 +104,7 @@ const Login = () => {
           </div>
 
           <input
-            className="btn py-2 w-80 mx-auto block bg-blue-400 font-bold text-white rounded hover:bg-blue-600 transition"
+            className="outline-none border-none py-2 w-80 mx-auto block bg-blue-400 font-bold text-white rounded hover:bg-blue-600 transition"
             type="submit"
             value="Login"
           />

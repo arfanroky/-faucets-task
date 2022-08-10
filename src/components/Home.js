@@ -5,7 +5,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import ReCAPTCHA from 'react-google-recaptcha';
 import auth from '../firebase.init';
 import Navbar from './Navbar';
-import { toast} from 'react-toastify';
+import { toast } from 'react-toastify';
 
 const ethHistory = [
   { id: 1, time: '12:30 AM', amount: 487, hash: '4s8er5s5fe57rjmxnfuewrurks' },
@@ -19,11 +19,10 @@ const Home = () => {
   const [walletAddress, setWalletAddress] = useState('');
   const linkRef = useRef();
   const ethRef = useRef();
-  const walletRef = useRef();
   const [user, loading] = useAuthState(auth);
   const [walletData, setWalletData] = useState([]);
   const [error, setError] = useState('');
- 
+
   useEffect(() => {
     const fetchWalletData = async () => {
       const { data } = await axios.get('http://localhost:8000/wallet');
@@ -33,19 +32,11 @@ const Home = () => {
     fetchWalletData();
   }, []);
 
-
-  const outPut = async (items) => {
-    items.map((item) => setEth(item));
-  };
-
   const handleReCAPTCHA = (e) => {
     console.log(e);
   };
 
-
-  
   if (loading) return <p>Loading...</p>;
-
 
   const handleWalletValue = async (e) => {
     const walletInfo = {
@@ -55,39 +46,37 @@ const Home = () => {
       email: user.email,
     };
 
-    const res = await axios.post(
-      'http://localhost:8000/wallet',
-      walletInfo
-    ).catch(err => {
-      console.log(err);
-    })
+    const res = await axios
+      .post('http://localhost:8000/wallet', walletInfo)
+      .catch((err) => {
+        console.log(err);
+      });
 
-    if(res.data.message){
-      toast.success(res.data.message)
+    if (res.data.message) {
+      toast.success(res.data.message);
     }
 
-    if(!res.data.errors){
-      setError('')
-    }
-    else{
+    if (!res.data.errors) {
+      setError('');
+    } else {
       setError(res.data.errors);
     }
-
   };
 
   return (
     <>
-      <Navbar setValue={setValue} />
-      <main className="-z-10 min-h-screen my-12">
-        <p className="bg-blue-500 text-center py-6 font-semibold text-white">
+      <Navbar passFunc={setValue} />
+      <main className=" my-12">
+        <br />
+        <p className="bg-blue-500 text-center py-6 font-semibold text-white mt-4">
           Notice Here
         </p>
-        <div className="bg-gray-200 md:h-[700px] mb-12 border-b-8">
+        <div className="bg-gray-200  mb-12 border-b-8">
           <div className="w-3/4 mx-auto pt-12">
             <h1 className="text-4xl font-bold text-blue-500 ">
               Request testnet LINK
             </h1>
-            <p className="py-2 w-[600px]">
+            <p className="py-2 md:w-[600px] text-justify">
               Get testnet LINK for an account on one of the supported blockchain
               testnets so you can create and test your own oracle and
               Chainlinked smart contract
@@ -109,11 +98,13 @@ const Home = () => {
               <input
                 className="block outline-none border border-gray-500 w-full pl-2"
                 type="text"
-                name='wallet'
+                name="wallet"
                 placeholder="Wallet Address..."
                 onChange={(e) => setWalletAddress(e.target.value)}
               />
-              <span className='text-red-600'>{ error ? error?.wallet.msg : ''}</span>
+              <span className="text-red-600">
+                {error ? error?.wallet.msg : ''}
+              </span>
             </div>
 
             <div className=" my-3 flex-1">
@@ -147,48 +138,88 @@ const Home = () => {
             />
             <button
               onClick={() => handleWalletValue()}
-              className="btn bg-blue-500 py-2 px-6 font-semibold text-white hover:bg-blue-700 mt-4"
+              className="btn btn-primary py-2 px-6 font-semibold text-white hover:bg-blue-700 mt-4"
             >
               Send Request
             </button>
 
             <div>
-              <h2 className="mt-4">Request History</h2>
-              <div className="flex my-4 text-white gap-5">
+              <h2 className="mt-4 font-bold">Request History</h2>
+              <div className="md:flex my-4 text-white gap-5">
                 <button
-                  onClick={() => outPut(ethHistory)}
-                  className="btn py-2 px-6 bg-purple-500"
+                  onClick={() => setWalletData(walletData)}
+                  className="btn btn-secondary md:mb-0 mb-4"
                 >
                   ETH Transaction History
                 </button>
-                <button className="btn py-2 px-6 bg-gray-400">
+                <button
+                  onClick={() => setWalletData(walletData)}
+                  className="btn btn-success"
+                >
                   TestLink Transaction History
                 </button>
               </div>
-              <table class="table-auto w-[600px] border">
-                <thead>
-                  <tr className="border">
-                    <th>Sr</th>
-                    <th>Time</th>
-                    <th>Amount</th>
-                    <th>Link</th>
-                    <th>Hash</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {walletData?.map((data, index) => (
-                    <>
-                      <tr className="border">
-                        <td>{index + 1}</td>
-                        <td>{data.date.slice(0, 10)}</td>
-                        <td>{data.eth}</td>
-                        <td>{data.link}</td>
-                        <td>{data.wallet}</td>
-                      </tr>
-                    </>
-                  ))}
-                </tbody>
-              </table>
+
+              <div className="md:block hidden">
+                <table className="table-auto w-[600px] border ">
+                  <thead>
+                    <tr className="border p-5">
+                      <th>Sr</th>
+                      <th>Time</th>
+                      <th>Amount</th>
+                      <th>Link</th>
+                      <th>Hash</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {walletData?.map((data, index) => (
+                      <>
+                        <tr key={data._id} className="border ">
+                          <td>{index + 1}</td>
+                          <td>{data.date.slice(0, 10)}</td>
+                          <td>{data.eth}</td>
+                          <td>{data.link}</td>
+                          <td>{data.wallet.slice(0, 10)}</td>
+                        </tr>
+                      </>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="md:hidden block">
+                {walletData.map((wallet) => (
+                  <>
+                    <div
+                      key={wallet._id}
+                      className="shadow rounded my-4 border border-gray-300 p-2"
+                    >
+                      <div className="flex justify-between">
+                        <span className="font-bold">Time</span>
+                        <p className="text-primary">
+                          {wallet.date.slice(0, 10)}
+                        </p>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <span className="font-bold">Amount</span>
+                        <p className="text-secondary">{wallet.eth}</p>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-bold">Link</span>
+                        <p className="text-secondary">{wallet.link}</p>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <span className="font-bold">Hash</span>
+                        <p className="text-green-600">
+                          {wallet.wallet.slice(0, 10)}
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                ))}
+              </div>
             </div>
           </div>
         </div>
