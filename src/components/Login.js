@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   useAuthState,
   useSignInWithEmailAndPassword,
@@ -7,8 +7,10 @@ import {
 import { useForm } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import auth from '../firebase.init';
+import { toast } from 'react-toastify';
 
 const Login = () => {
+  const [error, setError] = useState('');
   const {
     register,
     handleSubmit,
@@ -17,27 +19,30 @@ const Login = () => {
   } = useForm();
   const location = useLocation();
   const navigate = useNavigate();
-  const [user, loading, error] = useAuthState(auth);
+  const [user, loading, authError] = useAuthState(auth);
   const [signInWithEmailAndPassword, signInUser, signInLoading, signInError] =
     useSignInWithEmailAndPassword(auth);
   let from = location.state?.from?.pathname || '/';
-  useEffect(() => {
-    if (user) {
-      navigate(from, { replace: true });
-    }
-  }, [user, navigate, from]);
 
   if (loading || signInLoading) return <p>Loading.....</p>;
-  if (error || signInError) alert(error);
+  if (authError || signInError) console.log(authError);
 
   const onSubmit = async (e) => {
-    console.log(e);
     await signInWithEmailAndPassword(e.email, e.password);
-
     if (e.email) {
       const { data } = await axios
-        .get(`https://intense-chamber-34587.herokuapp.com/user/${e.email}`)
-        .catch((error) => console.log(error));
+        .get(`http://localhost:8000/people/${e.email}/${e.password}`)
+        .catch((err) => {
+          console.log(err);
+        });
+      console.log(data);
+      if (data.message) {
+        toast.success('Logged in successfully!');
+        navigate(from, { replace: true });
+      }
+      setError(data.errors);
+    } else {
+      toast.error('Email must type!');
     }
 
     reset();
@@ -49,7 +54,7 @@ const Login = () => {
         <div className="bg-blue-400 md:h-full md:py-0 py-12 flex-1 flex justify-center items-center flex-col">
           <h1 className="text-2xl font-bold text-white">New Here?</h1>
           <Link to="/sign-up">
-            <button className="btn bg-white py-2 px-6 mt-4 rounded font-bold">
+            <button className=" bg-white py-2 px-6 mt-4 rounded font-bold">
               Sign Up
             </button>
           </Link>
@@ -67,17 +72,9 @@ const Login = () => {
             <input
               className="block outline-none border-b border-black w-full focus:border-gray-600 pt-1 pb-2"
               type="email"
-              {...register('email', {
-                required: {
-                  value: true,
-                  message: 'Write your email',
-                },
-              })}
+              {...register('email')}
               placeholder="Enter your email"
             />
-            {errors.email?.type === 'required' && (
-              <span className="text-blue-600">{errors.email.message}</span>
-            )}
           </div>
 
           <div className=" my-3 w-80 mx-auto">
@@ -90,17 +87,9 @@ const Login = () => {
             <input
               className="block outline-none border-b border-black w-full focus:border-gray-600 pt-1 pb-2"
               type="password"
-              {...register('password', {
-                required: {
-                  value: true,
-                  message: 'Write your password',
-                },
-              })}
+              {...register('password')}
               placeholder="Enter your password"
             />
-            {errors.password?.type === 'required' && (
-              <span className="text-blue-600">{errors.password.message}</span>
-            )}
           </div>
 
           <input

@@ -31,12 +31,13 @@ const SignUp = () => {
   const [user, loading, authError] = useAuthState(auth);
 
   if (createLoading || updating || loading) return <p>Loading...</p>;
-  if (createError || updateError || authError) alert(createError || updateError || authError);
+  if (createError || updateError || authError)
+    console.log(createError || updateError || authError);
 
   const onSubmit = async (e) => {
     const name = e.firstName.concat(' ', e.lastName);
-    // await createUserWithEmailAndPassword(e.email, e.password);
-    // await updateProfile({ displayName: name });
+    await createUserWithEmailAndPassword(e.email, e.password);
+    await updateProfile({ displayName: name });
 
     const userCredential = {
       firstName: e.firstName,
@@ -47,10 +48,8 @@ const SignUp = () => {
       confirmPassword: e.confirmPassword,
     };
 
-    console.log(userCredential);
-
     if (e.email) {
-      await fetch(`http://localhost:8000/register`, {
+      await fetch(`http://localhost:8000/people`, {
         method: 'POST',
         headers: {
           'Content-type': 'application/json',
@@ -59,15 +58,17 @@ const SignUp = () => {
       })
         .then((res) => res.json())
         .then((data) => {
-          toast.success(data.message);
+          console.log(data);
+          if (data.message) {
+            toast.success('User Created Successfully!');
+          }
           setError(data.errors);
           if (data.message) {
             navigate('/');
           }
         });
-    }
-    else{
-      toast.error('Email must type!')
+    } else {
+      toast.error('Email must type!');
     }
 
     reset();
@@ -105,7 +106,7 @@ const SignUp = () => {
             />
             <span className="text-red-500">
               {' '}
-              {error ? error.firstName.msg : ''}
+              {error ? error?.firstName?.msg : ''}
             </span>
           </div>
 
@@ -125,7 +126,7 @@ const SignUp = () => {
             />
             <span className="text-red-500">
               {' '}
-              {error ? error.lastName.msg : ''}
+              {error ? error?.lastName?.msg : ''}
             </span>
           </div>
 
@@ -145,7 +146,7 @@ const SignUp = () => {
             />
             <span className="text-red-500">
               {' '}
-              {error ? error.phone.msg : ''}
+              {error ? error?.phone?.msg : ''}
             </span>
           </div>
 
@@ -165,7 +166,7 @@ const SignUp = () => {
             />
             <span className="text-red-500">
               {' '}
-              {error ? error.email.msg : ''}
+              {error ? error?.email?.msg : ''}
             </span>
           </div>
 
@@ -185,7 +186,7 @@ const SignUp = () => {
             />
             <span className="text-red-500">
               {' '}
-              {error ? error.password.msg : ''}
+              {error ? error?.password?.msg : ''}
             </span>
           </div>
           <div className=" my-3 w-80 mx-auto">
@@ -204,7 +205,7 @@ const SignUp = () => {
             />
             <span className="text-red-500">
               {' '}
-              {error ? error.confirmPassword.msg : ''}
+              {error ? error?.confirmPassword?.msg : ''}
             </span>
           </div>
 
